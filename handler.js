@@ -2,6 +2,7 @@ var socket;
 var username;
 var contentChat = [];
 var connected = [];
+var result;
 
 function connect(name){
     if(name == username)return;
@@ -19,6 +20,7 @@ function sendMessage(roomName){
     socket.emit('request-chat', {Username: username, Content: input.val(), RoomName:  roomName });
     input.val('');
 }
+
 $(document).ready(() => {
     $("#btn-login").click(() => {
         username = $("#username").val();
@@ -30,7 +32,7 @@ $(document).ready(() => {
             alert("Tên đăng nhập không được có khoảngs trống!");
             return;
         }
-        $.ajax({url :"https://vuongnv-chat.herokuapp.com/sign-in",
+        $.ajax({url :"http://localhost:3000/sign-in",
                 method: "post",
                 data:{username: username}
                 }).done((res) => {
@@ -38,7 +40,7 @@ $(document).ready(() => {
                         $('#login').css('display','none');
                         $('#login-success').css('display','block');
                         $('#d-username').html(username);
-                        socket = io("https://vuongnv-chat.herokuapp.com");
+                        socket = io("http://localhost:3000");
                         socket.emit("username",username);
                         socket.on("users", (data) => {
                             var table = $("#users");
@@ -68,15 +70,7 @@ $(document).ready(() => {
     let init = () => {
         socket.on("await-connect", data => {
             roomName = data.room;
-            var confirm = window.confirm(data.name + " muốn kết nối");
-            if(confirm){
-                console.log(confirm);
-                socket.emit("accept-connect",{friend: data.name, room: roomName});
-            }
-            else{
-                console.log(confirm);
-                socket.emit("reject-connect",{username: username, friend: data.name});
-            }
+            createDialogConfirm(data.name + ' muốn kết nối !',data, roomName)
         })
         socket.on("my-conversation", data => {
             let element = $('#'+data.roomName);
@@ -126,5 +120,17 @@ $(document).ready(() => {
             alert(data.friend +' từ chối kết nối!');
         });
     };
+    let createDialogConfirm =  async (message,data, roomName) => {
+        let dialog = `
+            <div class="dialog-confirm">
+                <p>${message}</p>
+                <div class="float-right">
+                    <button class="btn btn-light" onclick="socket.emit('reject-connect',{username: '${username}', friend: '${data.name}'});$('.dialog-confirm').remove(); ">Hủy</button>
+                    <button class="btn btn-primary" onclick="socket.emit('accept-connect',{friend: '${data.name}', room: '${roomName}'});$('.dialog-confirm').remove();">Đồng ý</button>
+                </div>
+            </div>
+        `;
+        $('body').append(dialog);
+    }
     
 })
