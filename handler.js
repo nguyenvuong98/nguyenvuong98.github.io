@@ -32,7 +32,7 @@ $(document).ready(() => {
             alert("Tên đăng nhập không được có khoảngs trống!");
             return;
         }
-        $.ajax({url :"https://vuongnv-chat.herokuapp.com//sign-in",
+        $.ajax({url :"https://vuongnv-chat.herokuapp.com/sign-in",
                 method: "post",
                 data:{username: username}
                 }).done((res) => {
