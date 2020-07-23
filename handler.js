@@ -32,7 +32,7 @@ $(document).ready(() => {
             alert("Tên đăng nhập không được có khoảngs trống!");
             return;
         }
-        $.ajax({url :"http://localhost:3000/sign-in",
+        $.ajax({url :"https://vuongnv-chat.herokuapp.com//sign-in",
                 method: "post",
                 data:{username: username}
                 }).done((res) => {
@@ -40,7 +40,7 @@ $(document).ready(() => {
                         $('#login').css('display','none');
                         $('#login-success').css('display','block');
                         $('#d-username').html(username);
-                        socket = io("http://localhost:3000");
+                        socket = io("https://vuongnv-chat.herokuapp.com");
                         socket.emit("username",username);
                         socket.on("users", (data) => {
                             var table = $("#users");
